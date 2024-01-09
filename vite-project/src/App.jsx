@@ -28,7 +28,7 @@ function App() {
   const deletePuppy = async (leavingPuppy) => {
     await axios.delete(`https://fsa-puppy-bowl.herokuapp.com/api/2310/players/${leavingPuppy.id}`)
     setPuppies(puppies.filter((stayingPuppies) => {return stayingPuppies.id !== leavingPuppy.id}))
-    navigate('/puppies')
+    navigate('./puppies')
   }
   
   return (
