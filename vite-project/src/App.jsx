@@ -1,49 +1,51 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import axios from 'axios'
-import PuppiesList from './PuppiesList'
-import SinglePuppy from './SinglePuppy'
-import NewPuppy from './NewPuppy'
-import SearchBar from './SearchBar'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Routes, Route } from 'react-router-dom';
+import NavBar from './NavBar';
+import PuppiesList from './PuppiesList';
+import SinglePuppy from './SinglePuppy';
+import NewPuppy from './NewPuppy';
+import './App.css';
 
 function App() {
-  const [puppies, setPuppies] = useState([])
-  const navigate = useNavigate()
+  const [players, setPlayers] = useState([]);
 
-  useEffect (() => {
-    const fetchPuppies = async () => {
-      const {data} = await axios.get('https://fsa-puppy-bowl.herokuapp.com/api/2310/players')
-      console.log(data.data.players)
-      setPuppies(data.data.players)
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        const { data } = await axios.get('https://fsa-puppy-bowl.herokuapp.com/api/2310/players');
+        setPlayers(data.data.players);
+      } catch (error) {
+        console.error('Error fetching players:', error);
+      }
+    };
+    fetchPlayers();
+  }, []);
+
+  const addPlayer = async (newPlayer) => {
+    setPlayers([...players, newPlayer]);
+  };
+
+  const deletePlayer = async (playerId) => {
+    try {
+      await axios.delete(`https://fsa-puppy-bowl.herokuapp.com/api/2310/players/${playerId}`);
+      setPlayers(players.filter((player) => player.id !== playerId));
+    } catch (error) {
+      console.error('Error deleting player:', error);
     }
-    fetchPuppies()
-  }, [])
+  };
 
-  const create = async (createdPuppy) => {
-    const {data} = await axios.post('https://fsa-puppy-bowl.herokuapp.com/api/2310/players', createdPuppy)
-    setPuppies([...puppies], data)
-  }
-
-  const deletePuppy = async (leavingPuppy) => {
-    await axios.delete(`https://fsa-puppy-bowl.herokuapp.com/api/2310/players/${leavingPuppy.id}`)
-    setPuppies(puppies.filter((stayingPuppies) => {return stayingPuppies.id !== leavingPuppy.id}))
-    navigate('./puppies')
-  }
-  
   return (
-    <div> 
+    <div>
+      <h1>Puppy Bowl 2023!</h1>
+      <NavBar />
       <Routes>
-        <Route path='./puppies' element={<PuppiesList puppies={puppies} />} />
-        <Route path='./puppies/:id' element={<SinglePuppy puppies={puppies} deletePuppy={deletePuppy} />} />
-        <Route path='./puppies/newpuppy' element={<NewPuppy create={create} />} />
+        <Route path="/" element={<AllPuppies players={players} onDeletePlayer={deletePlayer} />} />
+        <Route path="/singlepuppy/:id" element={<SinglePuppy players={players} onDeletePlayer={deletePlayer} />} />
+        <Route path="/newpuppy" element={<NewPuppy onAddPlayer={addPlayer} />} />
       </Routes>
-
-      <h3>Search:</h3>
-      <SearchBar puppies={puppies} />
     </div>
-
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,30 +1,34 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import { Link } from 'react-router-dom'
+const PuppiesList = ({ players, onDeletePlayer }) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-const PuppiesList = ({puppies}) => {
-    return (
-        <div>
-            <h1>Puppy Bowl Players</h1>
-            <h3>
-                <Link to='/puppies/newpuppy'>
-                    Click here to add a new puppy
-                </Link>
-            </h3>
-            <ul>
-                {
-                    puppies.map((puppy) => {
-                        return (
-                            <li key={puppy.id}>
-                                <Link to={`/puppies/${puppy.id}`}>
-                                    {puppy.name}
-                                </Link>
-                            </li>
-                        )
-                    })    
-                }
-            </ul>
-        </div>
-    )
-}
+  const filteredPlayers = players.filter((player) =>
+    player.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-export default PuppiesList
+  return (
+    <div>
+      <h2>All Players</h2>
+      <input
+        type="text"
+        placeholder="Search players..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <ul>
+        {filteredPlayers.map((player) => (
+          <li key={player.id}>
+            <Link to={`/singlepuppy/${player.id}`}>
+              {player.name}
+            </Link>
+        
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default PuppiesList;

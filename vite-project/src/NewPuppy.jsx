@@ -1,87 +1,71 @@
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
 
-const NewPuppy = ({create}) => {
-    const [name, setName] = useState('')
-    const [breed, setBreed] = useState('')
-    const [imageUrl, setImageUrl] = useState('')
-    const [status, setStatus] = useState('bench')
-    const [teamId, setTeamId] = useState(0)
+import React, { useState } from 'react'
+import axios from 'axios';
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
-        const createdPuppy = {
-            breed,
-            cohortId: 2310,
-            imageUrl,
-            name,
-            status,
-            teamId
+const NewPuppy = ({onAddPlayer}) => {
+    const [newPupp, setNewPupp] = useState({
+        name: '',
+        breed: '',
+        status: '',
+        imageUrl: '',
+      });
+    
+      const handleSubmit = async (event) => {
+        event.preventDefault();
+    
+        try {
+          const response = await axios.post('https://fsa-puppy-bowl.herokuapp.com/api/2310/players', newPupp);
+          onAddPlayer(response.data);
+          setNewPupp({
+            name: '',
+            breed: '',
+            status: '',
+            imageUrl: '',
+          });
+        } catch (error) {
+          console.error('Error adding player:', error);
         }
-        create(createdPuppy)
-        setName('')
-        setBreed('')
-        setImageUrl('')
-        setStatus('bench')
-        setTeamId(0)
-    }
-
-    return (
+      };
+    
+      return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Name:
-                    <input 
-                        type="text"
-                        value={name}
-                        onChange={(event) => {setName(event.target.value)}}
-                    />
-                </label>
-                <br />
-                <label>
-                    Breed:
-                    <input 
-                        type="text"
-                        value={breed}
-                        onChange={(event) => {setBreed(event.target.value)}}
-                    />
-                </label>
-                <br />
-                <label>
-                    Image URL:
-                    <input 
-                        type="text"
-                        value={imageUrl}
-                        onChange={(event) => {setImageUrl(event.target.value)}}
-                    />
-                </label>
-                <br />
-                <label>
-                    Status (enter field or bench):
-                    <input 
-                        type="text"
-                        value={status}
-                        onChange={(event) => {setStatus(event.target.value)}}
-                    />
-                </label>
-                <br />
-                <label>
-                    Team Id:
-                    <input 
-                        type="text"
-                        value={teamId}
-                        onChange={(event) => {setTeamId(event.target.value)}}
-                    />
-                </label>
-                <br />
-                <button type="submit">Submit</button>
-            </form>
-            <br />
-            <Link to='/puppies'>
-                Back to all puppies
-            </Link>
+          <h2>Add a New Player</h2>
+          <form onSubmit={handleSubmit}>
+            <label>
+              Name:
+              <input
+                type="text"
+                value={newPupp.name}
+                onChange={(event) => setNewPupp({ ...newPupp, name: event.target.value })}
+              />
+            </label>
+            <label>
+              Breed:
+              <input
+                type="text"
+                value={newPupp.breed}
+                onChange={(event) => setNewPupp({ ...newPupp, breed: event.target.value })}
+              />
+            </label>
+            <label>
+              Status:
+              <input
+                type="text"
+                value={newPupp.status}
+                onChange={(event) => setNewPupp({ ...newPupp, status: event.target.value })}
+              />
+            </label>
+            <label>
+              Image URL:
+              <input
+                type="text"
+                value={newPupp.imageUrl}
+                onChange={(event) => setNewPupp({ ...newPupp, imageUrl: event.target.value })}
+              />
+            </label>
+            <button type="submit">Submit</button>
+          </form>
         </div>
-    )
-}
-
+      );
+    };
 export default NewPuppy
